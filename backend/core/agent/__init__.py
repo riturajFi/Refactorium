@@ -22,6 +22,14 @@ from .graph.state import (
     record_file_read,
     record_grep_search,
 )
+from .tools import (
+    DEFAULT_TOOL_LIMITS,
+    ToolLimits,
+    build_repository_tools,
+    grep,
+    list_directory,
+    read_file,
+)
 
 __all__ = [
     "AgentExplorationState",
@@ -40,6 +48,12 @@ __all__ = [
     "record_duplicate_candidate",
     "record_file_read",
     "record_grep_search",
+    "ToolLimits",
+    "DEFAULT_TOOL_LIMITS",
+    "build_repository_tools",
+    "list_directory",
+    "read_file",
+    "grep",
     "validate_agent_execution_limits",
     "validate_no_candidate_thresholds",
 ]

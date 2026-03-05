@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: refactorium-py
+Version: 0.1.0
+Summary: Python migration of Refactorium backend
+Requires-Python: >=3.11
+Requires-Dist: flask<4.0.0,>=3.0.0
+Requires-Dist: langgraph<1.0.0,>=0.2.0
