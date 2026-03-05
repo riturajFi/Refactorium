@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .policy import validate_snapshot_inputs
+from .validation import validate_snapshot_inputs
 from .snapshot import Snapshot
 
 
