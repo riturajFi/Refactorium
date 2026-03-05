@@ -56,6 +56,7 @@ def new_agent_exploration_state() -> AgentExplorationState:
 
 class AgentStatus(str, Enum):
     EXPLORING = "exploring"
+    DUPLICATES_FOUND = "duplicates_found"
     READY_FOR_PATCH_GENERATION = "ready_for_patch_generation"
     EXPLORATION_LIMIT_REACHED = "exploration_limit_reached"
     NO_REFACTOR_FOUND = "no_refactor_found"
@@ -96,7 +97,8 @@ def evaluate_agent_status(
     1. Duplicate logic identified -> ready_for_patch_generation
     2. Exploration budget exhausted -> exploration_limit_reached
     3. Reasonable exploration with no candidates -> no_refactor_found
-    4. Otherwise -> exploring
+    4. Duplicate candidates exist -> duplicates_found
+    5. Otherwise -> exploring
     """
 
     thresholds = (
@@ -119,5 +121,8 @@ def evaluate_agent_status(
     enough_searches = state["grep_search_calls"] >= thresholds["min_search_calls"]
     if no_candidates and enough_files and enough_searches:
         return AgentStatus.NO_REFACTOR_FOUND
+
+    if state["duplicate_candidate_count"] > 0:
+        return AgentStatus.DUPLICATES_FOUND
 
     return AgentStatus.EXPLORING

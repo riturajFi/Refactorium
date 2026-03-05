@@ -91,6 +91,15 @@ class AgentSpecTests(unittest.TestCase):
         )
         self.assertEqual(status, AgentStatus.NO_REFACTOR_FOUND)
 
+    def test_evaluate_agent_status_duplicates_found(self) -> None:
+        state = new_agent_exploration_state()
+        state["duplicate_candidate_count"] = 2
+        status = evaluate_agent_status(
+            state,
+            {"max_tool_calls": 20, "max_files_read": 20, "max_exploration_steps": 20},
+        )
+        self.assertEqual(status, AgentStatus.DUPLICATES_FOUND)
+
     def test_evaluate_agent_status_keeps_exploring(self) -> None:
         state = new_agent_exploration_state()
         state["files_read"] = 4

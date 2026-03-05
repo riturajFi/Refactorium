@@ -13,7 +13,15 @@ from .spec import (
     validate_agent_execution_limits,
     validate_no_candidate_thresholds,
 )
-from .graph.state import AgentState, new_agent_state
+from .graph.state import (
+    AgentState,
+    STATE_UPDATE_RULES,
+    VALID_AGENT_STATE_STATUSES,
+    new_agent_state,
+    record_duplicate_candidate,
+    record_file_read,
+    record_grep_search,
+)
 
 __all__ = [
     "AgentExplorationState",
@@ -23,10 +31,15 @@ __all__ = [
     "DEFAULT_AGENT_LIMITS",
     "DEFAULT_NO_CANDIDATE_THRESHOLDS",
     "NoCandidateThresholds",
+    "STATE_UPDATE_RULES",
+    "VALID_AGENT_STATE_STATUSES",
     "evaluate_agent_status",
     "is_exploration_limit_reached",
     "new_agent_state",
     "new_agent_exploration_state",
+    "record_duplicate_candidate",
+    "record_file_read",
+    "record_grep_search",
     "validate_agent_execution_limits",
     "validate_no_candidate_thresholds",
 ]
