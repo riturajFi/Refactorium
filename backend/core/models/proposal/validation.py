@@ -1,5 +1,17 @@
 from __future__ import annotations
 
+"""Validation rules for agent-generated refactor proposals.
+
+This module enforces a small, explicit checklist:
+1. The patch must look like a unified diff.
+2. Proposal-declared changed files must exist in the snapshot.
+3. Patch-touched files must stay within snapshot boundaries.
+
+Mini example:
+- valid header: `diff --git a/app.py b/app.py`
+- invalid path: `../secrets.txt` (rejected as out of snapshot)
+"""
+
 from collections.abc import Collection
 from pathlib import PurePosixPath
 import re
@@ -32,6 +44,16 @@ class OutOfSnapshotPathError(ProposalValidationError):
 
 
 def validate_proposal(proposal: Proposal, snapshot_files: Collection[str]) -> None:
+    """Validate a proposal against snapshot file boundaries.
+
+    `snapshot_files` should be the repository files available in the captured
+    snapshot that the proposal is allowed to modify.
+
+    Mini example:
+    - snapshot_files: `{"app.py", "utils/helpers.py"}`
+    - proposal["changed_files"]: `["app.py"]` -> allowed
+    - proposal["changed_files"]: `["missing.py"]` -> raises `UnknownChangedFileError`
+    """
     snapshot_set = {_normalize_repo_path(path) for path in snapshot_files}
     changed_files = {_normalize_repo_path(path) for path in proposal["changed_files"]}
 
@@ -50,6 +72,13 @@ def validate_proposal(proposal: Proposal, snapshot_files: Collection[str]) -> No
 
 
 def _validate_unified_diff(unified_diff: str) -> None:
+    """Require both file headers and at least one hunk marker."""
+    # Mini examples:
+    # valid:
+    #   diff --git a/app.py b/app.py
+    #   @@ -1 +1 @@
+    # invalid (no header/hunk):
+    #   print("not a patch")
     lines = unified_diff.splitlines()
     has_header = any(_DIFF_HEADER_RE.match(line) for line in lines)
     has_hunk = any(line.startswith("@@") for line in lines)
@@ -58,6 +87,15 @@ def _validate_unified_diff(unified_diff: str) -> None:
 
 
 def _extract_diff_paths(unified_diff: str) -> set[str]:
+    """Extract touched file paths from `diff --git` headers.
+
+    Current scope keeps changes minimal by disallowing rename-style headers
+    where `a/<path>` and `b/<path>` differ.
+
+    Mini example:
+    - allowed: `diff --git a/app.py b/app.py`
+    - rejected rename: `diff --git a/old.py b/new.py`
+    """
     files: set[str] = set()
     for line in unified_diff.splitlines():
         match = _DIFF_HEADER_RE.match(line)
@@ -76,6 +114,10 @@ def _extract_diff_paths(unified_diff: str) -> set[str]:
 
 
 def _normalize_repo_path(path: str) -> str:
+    """Normalize and validate repository-relative POSIX paths."""
+    # Mini examples:
+    # accepted: "src/main.py" -> "src/main.py"
+    # rejected: "/etc/passwd", "../tmp/x.py", ""
     candidate = path.strip()
     parsed = PurePosixPath(candidate)
     parts = parsed.parts
