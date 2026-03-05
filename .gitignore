@@ -1,0 +1,14 @@
+# Codex artifacts
+
+# env variables
+/backend/.venv
+/backend/.cache/
+
+# cache files/folders (anywhere)
+**/__pycache__/
+**/.cache/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+*.pyc
+*.pyo
